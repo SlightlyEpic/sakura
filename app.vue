@@ -1,21 +1,12 @@
-<script setup lang="ts">
-import { ToastProvider } from 'reka-ui';
-</script>
-
 <template>
     <NuxtLayout>
-        <!-- <ToastProvider> -->
-        <UApp>
-            <NuxtPage />
-        </UApp>
-        <!-- </ToastProvider> -->
+        <NuxtPage />
+
+        <UNotifications />
     </NuxtLayout>
 </template>
 
 <style lang="css">
-@import "tailwindcss";
-@import "@nuxt/ui";
-
 html {
     width: 100%;
     height: 100%;

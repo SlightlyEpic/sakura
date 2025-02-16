@@ -27,7 +27,7 @@ const items = [
 </script>
 
 <template>
-    <UDropdownMenu :items="items" v-if="session.user.value" class="*:w-full *:h-full *:text-center *:content-center">
+    <UDropdown :items="items" v-if="session.user.value" class="*:w-full *:h-full *:text-center *:content-center">
         <UAvatar :alt="session.user.value.name" class="select-none hover:ring-2 cursor-pointer" size="md" />
 
         <template #account="{ item }">
@@ -46,7 +46,7 @@ const items = [
 
             <UIcon v-if="item.icon" :name="item.icon" class="flex-shrink-0 h-4 w-4 text-gray-400 dark:text-gray-500 ms-auto" />
         </template>
-    </UDropdownMenu>
+    </UDropdown>
     <NuxtLink v-else to="/auth/login">
         <UButton variant="outline">Login</UButton>
     </NuxtLink>

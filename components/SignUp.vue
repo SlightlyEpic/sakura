@@ -35,8 +35,7 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
         toast.add({
             title: 'Sign Up failed',
             description: err.statusMessage,
-            color: 'error',
-            duration: 3000,
+            color: 'red',
         });
     } finally {
         isLoading.value = false;
@@ -68,19 +67,19 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
 
         <!-- Likely a bug in NuxtUI v3 -->
         <UForm :state="formState" :schema="signupBodySchema" @submit="onSubmit as any" class="flex flex-col gap-4">
-            <UFormField name="name" class="flex flex-col gap-1">
+            <UFormGroup name="name" class="flex flex-col gap-1">
                 <template #label>
                     <span class="font-bold">Username</span>
                 </template>
-                <UInput v-model="formState.name" placeholder="Enter your username" size="md" class="w-full" />
-            </UFormField>
-            <UFormField name="email" class="flex flex-col gap-1">
+                <UInput v-model="formState.name" placeholder="Enter your username" size="md" />
+            </UFormGroup>
+            <UFormGroup name="email" class="flex flex-col gap-1">
                 <template #label>
                     <span class="font-bold">Email</span>
                 </template>
-                <UInput v-model="formState.email" placeholder="Enter your email" size="md" class="w-full" />
-            </UFormField>
-            <UFormField  name="password" class="flex flex-col gap-1">
+                <UInput v-model="formState.email" placeholder="Enter your email" size="md" />
+            </UFormGroup>
+            <UFormGroup  name="password" class="flex flex-col gap-1">
                 <template #label>
                     <span class="font-bold">Password</span>
                 </template>
@@ -89,16 +88,15 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
                     :type="passwordVisible ? 'text' : 'password'" 
                     placeholder="Enter your password" 
                     size="md"
-                    class="w-full"
                 >
                     <template #trailing>
-                        <UButton :padded="false" variant="link" color="neutral" @click="passwordVisible = !passwordVisible">
+                        <UButton :padded="false" variant="link" color="gray" @click="passwordVisible = !passwordVisible">
                             <UIcon v-if="passwordVisible" name="heroicons:eye-slash-16-solid" class="cursor-pointer z-10" size="20" />
                             <UIcon v-else name="heroicons:eye-16-solid" class="cursor-pointer z-10" size="20" />
                         </UButton>
                     </template>
                 </UInput>
-            </UFormField>
+            </UFormGroup>
 
             <UButton 
                 type="submit" variant="soft" size="md"

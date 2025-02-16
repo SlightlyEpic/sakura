@@ -14,12 +14,16 @@ import { SplitterGroup, SplitterPanel, SplitterResizeHandle } from 'reka-ui';
                     <USeparator orientation="vertical" icon="i-clarity-drag-handle-line" />
                 </SplitterResizeHandle>
                 <SplitterPanel>
-                    <UTabs :items="[{ label: 'simulator' }, { label: 'assembler' }]">
-                        <template #simulator="{ item }">
-                            <IdeSimulator />
-                        </template>
-                        <template #assembler="{ item }">
-                            <IdeAssembler />
+                    <UTabs
+                        :items="[{ label: 'Simulator' }, { label: 'Assembler' }]" 
+                        class="h-full p-2"
+                        :ui="{
+                            container: 'h-full *:h-full',
+                        }"
+                    >
+                        <template #item="{ item }">
+                            <IdeSimulator v-if="item.label === 'Simulator'" />
+                            <IdeAssembler asm-source="" v-else-if="item.label === 'Assembler'" />
                         </template>
                     </UTabs>
                 </SplitterPanel>

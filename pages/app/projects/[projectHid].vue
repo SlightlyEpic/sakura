@@ -4,8 +4,6 @@ definePageMeta({
     layout: 'ide',
 });
 
-import AVRLASS from '~/shared/lib/avrlass';
-
 const route = useRoute();
 const projectHid = route.params.projectHid as string;
 </script>
