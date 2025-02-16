@@ -21,6 +21,8 @@ export default defineEventHandler(async (event) => {
 
     await setUserSession(event, {
         user: {
+            name: dbUser.name,
+            email: dbUser.email,
             oauth: false,
             userId: dbUser.id,
             roles: dbUser.roles.map(r => r.role),

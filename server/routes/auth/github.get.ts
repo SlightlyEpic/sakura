@@ -28,6 +28,8 @@ export default defineOAuthGitHubEventHandler({
 
             await setUserSession(event, {
                 user: {
+                    name: dbUser.name,
+                    email: dbUser.email,
                     oauth: true,
                     oauthProvider: 'github',
                     oauthId: `github|${user.id}`,

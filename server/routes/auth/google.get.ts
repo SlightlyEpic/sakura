@@ -28,6 +28,8 @@ export default defineOAuthGoogleEventHandler({
 
             await setUserSession(event, {
                 user: {
+                    name: dbUser.name,
+                    email: dbUser.email,
                     oauth: true,
                     oauthProvider: 'google',
                     oauthId: `google|${user.sub}`,

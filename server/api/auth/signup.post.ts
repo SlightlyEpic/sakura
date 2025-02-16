@@ -14,6 +14,8 @@ export default defineEventHandler(async (event) => {
     const dbUser = await queries.auth.createNewUser(db, body.name, body.email, passwordHash);
     await setUserSession(event, {
         user: {
+            name: dbUser.name,
+            email: dbUser.email,
             oauth: false,
             userId: dbUser.id,
             roles: [],
