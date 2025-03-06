@@ -1,5 +1,7 @@
 <script setup lang="ts">
+// import { parse as parseIntelHex } from 'intel-hex';
 import AVRLASS from '~/assets/lib/avrlass';
+import { parse as parseIntelHex } from '~/assets/lib/intel-hex';
 
 const props = defineProps<{
     asmSource: string,
@@ -7,7 +9,9 @@ const props = defineProps<{
 
 // @ts-expect-error
 const avr = AVRLASS as AVRLASS;
+
 const hexOut = ref<string>();
+const binOut = ref<Uint8Array | undefined>();
 const compileError = ref<string | undefined>();
 
 const includeCache = useIncludeCacheStore();
@@ -33,14 +37,21 @@ async function readInclude(filename: string) {
 }
 
 async function assemble() {
-    console.log('assembling');
     try {
-        hexOut.value = await avr.asm_to_hex(props.asmSource ?? '', readInclude);
-    } catch(_err: unknown) {}
+        const newHex = await avr.asm_to_hex(props.asmSource ?? '', readInclude);
+        const { data: newBin } = parseIntelHex(newHex);
+
+        hexOut.value = newHex;
+        binOut.value = newBin;
+    } catch(_err: unknown) {
+        console.error(_err);
+    }
 }
 
 defineExpose({
-    assemble
+    assemble,
+    hexOut,
+    binOut,
 });
 </script>
 
@@ -57,6 +68,10 @@ defineExpose({
     <div v-show="!compileError" class="whitespace-pre flex flex-col">
         <div>Assembled Hex: </div>
         <div>{{ hexOut }}</div>
+    </div>
+    <div v-show="!compileError" class="whitespace-pre flex flex-col">
+        <div>Binary output: </div>
+        <div>{{ binOut }}</div>
     </div>
 </div>
 </template>
