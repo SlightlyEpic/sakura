@@ -28,7 +28,7 @@ declare class AVRLASS {
      * @param reader Function to read included files
      * @param context Compilation context
      */
-    parse(str: string, reader: (filename: string) => string, context: Record<string, any>): {
+    async parse(str: string, reader: (filename: string) => string | Promise<string>, context: Record<string, any>): {
         __main__: Array<[string, any[]]>;
         [key: string]: Array<[string, any[]]>;
     };
@@ -65,7 +65,7 @@ declare class AVRLASS {
      * @param str Assembly code string
      * @param reader Function to read included files
      */
-    asm_to_hex(str: string, reader: (filename: string) => string): string;
+    asm_to_hex(str: string, reader: (filename: string) => string | Promise<string>): Promise<string>;
 }
 
 declare namespace AVRLASS {

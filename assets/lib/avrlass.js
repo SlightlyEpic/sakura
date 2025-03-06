@@ -304,7 +304,7 @@ const AVRLASS = new function () {
         return context;
     }
 
-    function parse(str, reader, context) {
+    async function parse(str, reader, context) {
 
         str = str.replace(/\r/g, '\n').replace(/\\\n/g, ' ').split("\n").map(x => x.split(';')[0]).join('\n');
         str = str.replace(/\t/g, ' ');
@@ -367,8 +367,8 @@ const AVRLASS = new function () {
             if (lines[i].endsWith(":")) {
                 lst[cur].push(['$LABEL', lines[i].slice(0, -1)]);
             } else if (lines[i].startsWith(".INCLUDE")) {
-                let inc = reader(lines[i].slice(8).trim().slice(1, -1));
-                let mst = parse(inc, reader, context);
+                let inc = await reader(lines[i].slice(8).trim().slice(1, -1));
+                let mst = await parse(inc, reader, context);
                 for (let k in mst) {
                     if (k == '__main__') {
                         lst[k] = lst[k].concat(mst[k]);
@@ -630,9 +630,9 @@ const AVRLASS = new function () {
     that.to_ihex = to_ihex;
     that.summary = sum;
     that.print_summary = print_summary;
-    that.asm_to_hex = function (str, reader) {
+    that.asm_to_hex = async function (str, reader) {
         let context = new_context({});
-        let lst = parse(str, reader, context);
+        let lst = await parse(str, reader, context);
         let ins = compile(lst, context);
         console.log(print_summary());
         let code = assemble(ins);
