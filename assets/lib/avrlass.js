@@ -2,7 +2,7 @@
  * Source: https://github.com/LingDong-/avrlass/blob/main/avrlass.js
  */
 
-var AVRLASS = new function () {
+const AVRLASS = new function () {
     let that = this;
     let device = {
         name: '',
@@ -641,6 +641,7 @@ var AVRLASS = new function () {
     }
 }
 
-if (typeof module != "undefined") {
-    module.exports = AVRLASS;
-}
+export default AVRLASS;
+// if (typeof module != "undefined") {
+//     module.exports = AVRLASS;
+// }

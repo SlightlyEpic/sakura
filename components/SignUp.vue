@@ -63,7 +63,7 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
             </a>
         </div>
 
-        <USeparator label="or" />
+        <UDivider label="or" />
 
         <!-- Likely a bug in NuxtUI v3 -->
         <UForm :state="formState" :schema="signupBodySchema" @submit="onSubmit as any" class="flex flex-col gap-4">

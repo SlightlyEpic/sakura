@@ -1,5 +1,8 @@
 <script setup lang="ts">
+import type { IdeEditor } from '#components';
 import { SplitterGroup, SplitterPanel, SplitterResizeHandle } from 'reka-ui';
+
+const editor = useTemplateRef('editor-ref');
 </script>
 
 <template>
@@ -8,10 +11,10 @@ import { SplitterGroup, SplitterPanel, SplitterResizeHandle } from 'reka-ui';
         <ClientOnly>
             <SplitterGroup direction="horizontal">
                 <SplitterPanel>
-                    <IdeEditor />
+                    <IdeEditor ref="editor-ref" />
                 </SplitterPanel>
                 <SplitterResizeHandle :as-child="true">
-                    <USeparator orientation="vertical" icon="i-clarity-drag-handle-line" />
+                    <UDivider orientation="vertical" icon="i-clarity-drag-handle-line" />
                 </SplitterResizeHandle>
                 <SplitterPanel>
                     <UTabs
@@ -23,7 +26,7 @@ import { SplitterGroup, SplitterPanel, SplitterResizeHandle } from 'reka-ui';
                     >
                         <template #item="{ item }">
                             <IdeSimulator v-if="item.label === 'Simulator'" />
-                            <IdeAssembler asm-source="" v-else-if="item.label === 'Assembler'" />
+                            <IdeAssembler :asm-source="editor?.code ?? ''" v-else-if="item.label === 'Assembler'" />
                         </template>
                     </UTabs>
                 </SplitterPanel>

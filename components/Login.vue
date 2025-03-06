@@ -62,7 +62,7 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
             </a>
         </div>
 
-        <USeparator label="or" />
+        <UDivider label="or" />
 
         <UForm :state="formState" :schema="loginBodySchema" @submit="onSubmit" class="flex flex-col gap-4">
             <UFormGroup name="email" class="flex flex-col gap-1">
