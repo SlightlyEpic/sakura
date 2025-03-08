@@ -5,12 +5,24 @@ import { SplitterGroup, SplitterPanel, SplitterResizeHandle } from 'reka-ui';
 const editor = useTemplateRef('editor-ref');
 const assembler = useTemplateRef('assembler-ref');
 const simulator = useTemplateRef('simulator-ref');
+
+const tabItems = [
+    { label: 'Simulator' },
+    { label: 'Assembler' },
+];
 </script>
 
 <template>
     <div class="flex h-full w-full">
         <IdeSidebar />
         <ClientOnly>
+            <template #fallback>
+                <div class="w-full h-full flex flex-col items-center justify-center gap-2 p-2">
+                    <div>Loading</div>
+                    <UProgress animation="carousel" class="w-full max-w-36" />
+                </div>
+            </template>
+
             <SplitterGroup direction="horizontal">
                 <SplitterPanel>
                     <IdeEditor ref="editor-ref" />
@@ -20,7 +32,7 @@ const simulator = useTemplateRef('simulator-ref');
                 </SplitterResizeHandle>
                 <SplitterPanel>
                     <UTabs
-                        :items="[{ label: 'Simulator' }, { label: 'Assembler' }]" 
+                        :items="tabItems" 
                         class="h-full p-2"
                         :ui="{
                             container: 'h-full *:h-full',
