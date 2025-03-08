@@ -1,15 +1,27 @@
 <script setup lang="ts">
-import type { ViewUpdate } from '@codemirror/view';
-import type { LanguageSupport } from '@codemirror/language';
+import { EditorView, type ViewUpdate } from '@codemirror/view';
+import { Compartment, type Extension } from '@codemirror/state';
 import type { CodeMirrorRef, Statistics } from '~/types/nuxt-codemirror';
 import sampleCode from '~/assets/misc/sample-code.S?raw';
 
 const container = useTemplateRef<HTMLDivElement>('container');
 const codemirror = useTemplateRef<CodeMirrorRef>('codemirror');
 
-const extensions: LanguageSupport[] = [];
-
+const wordWrap = ref(false);
 const code = ref(sampleCode);
+
+const lineWrapComp = new Compartment();
+const extensions: Extension[] = [
+    lineWrapComp.of(wordWrap.value ? EditorView.lineWrapping : []),
+];
+    
+watch(wordWrap, () => {
+    if(!codemirror.value) return;
+    if(!codemirror.value.view) return;
+    codemirror.value.view.dispatch({
+        effects: lineWrapComp.reconfigure(wordWrap.value ? EditorView.lineWrapping : []),
+    });
+})
 
 const handleChange = (value: string, viewUpdate: ViewUpdate) => {
     // console.log('Value changed:', value);
@@ -30,7 +42,13 @@ defineExpose({
 </script>
 
 <template>
-    <div ref="container" class="w-full h-full flex grow font-mono">
+    <div ref="container" class="w-full h-full flex flex-col grow font-mono">
+        <div class="flex items-center justify-end h-8 px-2 gap-2">
+            <div class="flex items-center gap-2">
+                Word Wrap
+                <UToggle v-model="wordWrap" />
+            </div>
+        </div>
         <NuxtCodeMirror
             ref="codemirror"
             v-model="code"
