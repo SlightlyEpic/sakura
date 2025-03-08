@@ -1,13 +1,28 @@
 <script setup lang="ts">
-import type { EditorState } from '@codemirror/state'
-import type { EditorView } from '@codemirror/view'
+import type { ViewUpdate } from '@codemirror/view';
+import type { LanguageSupport } from '@codemirror/language';
+import type { CodeMirrorRef, Statistics } from '~/types/nuxt-codemirror';
+import sampleCode from '~/assets/misc/sample-code.S?raw';
 
-const editor = ref<HTMLDivElement | null>(null)
-const container = ref<HTMLDivElement | null>(null)
-const view = ref<EditorView>()
-const state = ref<EditorState>()
+const container = useTemplateRef<HTMLDivElement>('container');
+const codemirror = useTemplateRef<CodeMirrorRef>('codemirror');
 
-const code = ref('');
+const extensions: LanguageSupport[] = [];
+
+const code = ref(sampleCode);
+
+const handleChange = (value: string, viewUpdate: ViewUpdate) => {
+    // console.log('Value changed:', value);
+    // console.log('View updated:', viewUpdate);
+};
+
+const handleStatistics = (stats: Statistics) => {
+    // console.log('Editor statistics:', stats);
+};
+
+const handleUpdate = (viewUpdate: ViewUpdate) => {
+    // console.log('Editor updated:', viewUpdate);
+};
 
 defineExpose({
     code,
@@ -16,10 +31,20 @@ defineExpose({
 
 <template>
     <div ref="container" class="w-full h-full flex grow font-mono">
-        <textarea 
+        <NuxtCodeMirror
+            ref="codemirror"
             v-model="code"
-            class="w-full h-full focus:outline-none focus:ring-0 px-4 py-2" 
-            placeholder="code here"
+            :extensions="extensions"
+            theme="dark"
+            placeholder="Enter your code here..."
+            :auto-focus="true"
+            :editable="true"
+            :basic-setup="true"
+            :indent-with-tab="true"
+            @on-change="(handleChange)"
+            @statistics="(handleStatistics)"
+            @on-update="(handleUpdate)"
+            class="w-full h-full"
         />
     </div>
 </template>
@@ -27,5 +52,6 @@ defineExpose({
 <style>
 .cm-editor {
     width: 100%;
+    height: 100%;
 }
 </style>

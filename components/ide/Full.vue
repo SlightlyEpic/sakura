@@ -3,6 +3,8 @@ import type { IdeEditor } from '#components';
 import { SplitterGroup, SplitterPanel, SplitterResizeHandle } from 'reka-ui';
 
 const editor = useTemplateRef('editor-ref');
+const assembler = useTemplateRef('assembler-ref');
+const simulator = useTemplateRef('simulator-ref');
 </script>
 
 <template>
@@ -14,7 +16,7 @@ const editor = useTemplateRef('editor-ref');
                     <IdeEditor ref="editor-ref" />
                 </SplitterPanel>
                 <SplitterResizeHandle :as-child="true">
-                    <UDivider orientation="vertical" icon="i-clarity-drag-handle-line" />
+                    <UDivider class="w-0" orientation="vertical" icon="i-clarity-drag-handle-line" />
                 </SplitterResizeHandle>
                 <SplitterPanel>
                     <UTabs
@@ -25,8 +27,16 @@ const editor = useTemplateRef('editor-ref');
                         }"
                     >
                         <template #item="{ item }">
-                            <IdeSimulator v-if="item.label === 'Simulator'" />
-                            <IdeAssembler :asm-source="editor?.code ?? ''" v-else-if="item.label === 'Assembler'" />
+                            <IdeSimulator
+                                ref="simulator-ref" 
+                                v-if="item.label === 'Simulator'"
+                                :prog-data="assembler?.binOut"
+                            />
+                            <IdeAssembler 
+                                ref="assembler-ref"
+                                v-else-if="item.label === 'Assembler'"
+                                :asm-source="editor?.code ?? ''"
+                            />
                         </template>
                     </UTabs>
                 </SplitterPanel>

@@ -44,6 +44,7 @@ async function assemble() {
         hexOut.value = newHex;
         binOut.value = newBin;
     } catch(_err: unknown) {
+        compileError.value = `${_err}`;
         console.error(_err);
     }
 }
@@ -58,10 +59,6 @@ defineExpose({
 <template>
 <div class="w-full h-full flex flex-col gap-2">
     <UButton class="w-max" @click="assemble">Assemble</UButton>
-    <div class="whitespace-pre flex flex-col">
-        <div>Code: </div>
-        <div>{{ asmSource }}</div>
-    </div>
     <div v-show="compileError" class="text-rose-500">
         Compile error: {{ compileError }}
     </div>
