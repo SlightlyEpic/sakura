@@ -1,5 +1,4 @@
 <script setup lang="ts">
-// import { parse as parseIntelHex } from 'intel-hex';
 import AVRLASS from '~/assets/lib/avrlass';
 import { parse as parseIntelHex } from '~/assets/lib/intel-hex';
 
@@ -57,7 +56,7 @@ defineExpose({
 </script>
 
 <template>
-<div class="w-full h-full flex flex-col gap-2">
+<div class="w-full h-full flex flex-col gap-2 p-2">
     <UButton class="w-max" @click="assemble">Assemble</UButton>
     <div v-show="compileError" class="text-rose-500">
         Compile error: {{ compileError }}
@@ -66,9 +65,9 @@ defineExpose({
         <div>Assembled Hex: </div>
         <div>{{ hexOut }}</div>
     </div>
-    <div v-show="!compileError" class="whitespace-pre flex flex-col">
+    <div v-show="!compileError" class="flex flex-col">
         <div>Binary output: </div>
-        <div>{{ binOut }}</div>
+        <div>{{ binOut?.join(' ') }}</div>
     </div>
 </div>
 </template>

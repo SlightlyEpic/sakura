@@ -9,5 +9,5 @@ const projectHid = route.params.projectHid as string;
 </script>
 
 <template>
-<IdeFull />
+<Ide />
 </template>

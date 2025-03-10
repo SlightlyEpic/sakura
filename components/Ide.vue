@@ -33,9 +33,12 @@ const tabItems = [
                 <SplitterPanel>
                     <UTabs
                         :items="tabItems" 
-                        class="h-full p-2"
+                        class="flex flex-col h-full"
                         :ui="{
                             container: 'h-full *:h-full',
+                            list: {
+                                base: 'm-2'
+                            }
                         }"
                     >
                         <template #item="{ item }">
@@ -56,3 +59,9 @@ const tabItems = [
         </ClientOnly>
     </div>
 </template>
+
+<style>
+[role=tablist] {
+    width: auto;
+}
+</style>
