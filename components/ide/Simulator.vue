@@ -43,7 +43,7 @@ defineExpose({
 
 <template>
     <SplitterGroup direction="vertical">
-        <SplitterPanel>
+        <SplitterPanel :default-size="75">
             <div class="w-full h-full flex flex-col gap-2 p-2">
                 <div class="flex gap-2">
                     <UButton @click="() => cpu && avrInstruction(cpu)" class="w-max">Tick</UButton>
@@ -77,11 +77,12 @@ defineExpose({
             </div>
         </SplitterPanel>
         <SplitterResizeHandle :as-child="true">
-            <UDivider class="h-0" orientation="horizontal" icon="i-clarity-drag-handle-line" />
+            <UDivider class="h-0" orientation="horizontal">
+                <UIcon name="clarity:drag-handle-line" class="w-5 h-5 rotate-90" />
+            </UDivider>
         </SplitterResizeHandle>
-        <SplitterPanel>
+        <SplitterPanel :default-size="25">
             <IdeSimulatorRegisterView :cpu="cpu" />
         </SplitterPanel>
     </SplitterGroup>
-
 </template>
