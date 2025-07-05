@@ -23,6 +23,7 @@
     "@nuxt/ui": "2.21.0",
     "@pinia/nuxt": "0.9.0",
     "avr8js": "^0.20.1",
+    "better-auth": "^1.2.7",
     "codemirror": "^6.0.1",
     "dotenv": "^16.4.7",
     "drizzle-orm": "^0.39.1",

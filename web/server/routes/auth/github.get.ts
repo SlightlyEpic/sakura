@@ -1,7 +1,7 @@
 import { eq } from 'drizzle-orm';
 
 import { users } from '~/server/database/schema';
-import { useDB } from '~/server/utils/db';
+import { useDB } from '~/server/database/db';
 import { queries } from '~/server/database/queries';
 
 import { type AuthUser } from '~/shared/utils/types';

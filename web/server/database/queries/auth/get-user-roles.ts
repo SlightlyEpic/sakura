@@ -1,6 +1,6 @@
 import { eq } from 'drizzle-orm';
 import { userRoles } from '~/server/database/schema';
-import { type useDB } from '~/server/utils/db';
+import { type useDB } from '~/server/database/db';
 
 /**
  * @param drizzle drizzle instance

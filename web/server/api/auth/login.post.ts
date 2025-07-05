@@ -1,4 +1,4 @@
-import { useDB } from '~/server/utils/db';
+import { useDB } from '~/server/database/db';
 import { queries } from '~/server/database/queries';
 import { loginBodySchema } from '~/shared/api-schema/auth';
 

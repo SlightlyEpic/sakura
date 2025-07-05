@@ -1,6 +1,6 @@
 import pg from 'postgres';
 import { users } from '~/server/database/schema';
-import { type useDB } from '~/server/utils/db';
+import { type useDB } from '~/server/database/db';
 import { isUniqueViolation } from '~/server/utils/pg-error';
 
 /**
