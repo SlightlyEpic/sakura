@@ -1,9 +1,11 @@
 <script setup lang="ts">
-const session = useUserSession();
+import { authClient } from '~/lib/auth-client';
+
+const session = await authClient.useSession(useFetch);
 
 const items = [
     [{
-        label: session.user.value?.email ?? '',
+        label: session.data.value?.user.email ?? '',
         slot: 'account',
         disabled: true
     }], [{
@@ -27,8 +29,8 @@ const items = [
 </script>
 
 <template>
-    <UDropdown :items="items" v-if="session.user.value" class="*:w-full *:h-full *:text-center *:content-center">
-        <UAvatar :alt="session.user.value.name" class="select-none hover:ring-2 cursor-pointer" size="md" />
+    <UDropdown :items="items" v-if="session.data.value" class="*:text-center *:content-center">
+        <UAvatar :alt="session.data.value.user.name" class="select-none hover:ring-2 cursor-pointer" size="md" />
 
         <template #account="{ item }">
             <div class="text-left">

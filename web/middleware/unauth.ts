@@ -1,8 +1,11 @@
-export default defineNuxtRouteMiddleware((to, from) => {
-    const session = useUserSession();
-    const redirectTo = to.query.to as (string | string[] | undefined);
-    if(session.user.value) {
-        if(Array.isArray(redirectTo)) return navigateTo(redirectTo[0] ?? '/', { external: true })
-        else return navigateTo(redirectTo ?? '/', { external: true });
+import { authClient } from '~/lib/auth-client';
+
+export default defineNuxtRouteMiddleware(async (to, from) => {
+    const { data: session } = await authClient.useSession(useFetch);
+    if (session.value) {
+        const redirectTo = to.query.to as (string | string[] | undefined);
+        return Array.isArray(redirectTo)
+            ? navigateTo(redirectTo[0] ?? '/', { external: true })
+            : navigateTo(redirectTo ?? '/', { external: true });
     }
 })

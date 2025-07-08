@@ -1,5 +1,2 @@
-import { auth } from './auth';
 
-export const queries = {
-    auth,
-};
+export const queries = {};

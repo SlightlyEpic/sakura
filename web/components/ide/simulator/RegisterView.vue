@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { CPU } from 'avr8js';
 import { CollapsibleContent, CollapsibleRoot, CollapsibleTrigger } from 'reka-ui';
-import { leftPad, range } from '~/shared/utils/misc';
+import { range } from '~/shared/utils/misc';
 
 const props = defineProps<{
     cpu: CPU | undefined,
@@ -21,9 +21,9 @@ const registers = new Array(32).fill(0).map((_, i) => computed(() => {
 
     let regValue = props.cpu.data[i];
     switch(numberBase.value) {
-        case 'Binary': return '0b' + leftPad(regValue.toString(2), 8, '0');
+        case 'Binary': return '0b' + regValue.toString(2).padStart(8, '0');
         case 'Decimal': return regValue;
-        case 'Hex': return '0x' + leftPad(regValue.toString(2), 2, '0');
+        case 'Hex': return '0x' + regValue.toString(2).padStart(2, '0');
     }
 }))
 
@@ -38,9 +38,9 @@ const bigRegisters = [0, 1, 2].map(i => computed(() => {
 
     const regValue = props.cpu.dataView.getUint16(26 + 2 * i, true);
     switch(numberBase.value) {
-        case 'Binary': return '0b' + leftPad(regValue.toString(2), 16, '0');
+        case 'Binary': return '0b' + regValue.toString(2).padStart(16, '0');
         case 'Decimal': return regValue;
-        case 'Hex': return '0x' + leftPad(regValue.toString(2), 4, '0');
+        case 'Hex': return '0x' + regValue.toString(2).padStart(4, '0');
     }
 }))
 </script>
@@ -64,7 +64,7 @@ const bigRegisters = [0, 1, 2].map(i => computed(() => {
                 <div class="grid dyn-grid-cols gap-2">
                     <div v-for="i in range(0, 16)" :key="i" class="p-2">
                         <div>
-                            Reg <span class="whitespace-pre">{{ leftPad(`${i}`, 2) }}</span>:
+                            Reg <span class="whitespace-pre">{{ `${i}`.padStart(2) }}</span>:
                             <span>
                                 {{ registers[i] }}
                             </span>
@@ -90,7 +90,7 @@ const bigRegisters = [0, 1, 2].map(i => computed(() => {
                 <div class="grid dyn-grid-cols gap-2">
                     <div v-for="i in range(16, 32)" :key="i" class="p-2">
                         <div>
-                            Reg <span class="whitespace-pre">{{ leftPad(`${i}`, 2) }}</span>:
+                            Reg <span class="whitespace-pre">{{ `${i}`.padStart(2) }}</span>:
                             <span>
                                 {{ registers[i] }}
                             </span>

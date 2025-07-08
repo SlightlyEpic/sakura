@@ -1,5 +1,5 @@
 import { drizzle } from 'drizzle-orm/postgres-js';
-import * as schema from '~/server/database/schema';
+import * as schema from './schema';
 
 const db = drizzle({
     connection: {
@@ -9,7 +9,7 @@ const db = drizzle({
         port: Number(process.env.POSTGRES_PORT as string),
         database: process.env.POSTGRES_DATABASE as string,
     },
-    schema: schema,
+    schema,
 });
 
 export function useDB() {

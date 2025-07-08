@@ -1,2 +1,1 @@
-export { users, usersRelations } from './users.sql';
-export { userRoles, userRolesRelations } from './userRoles.sql';
+export { user, account, session, verification } from './auth.sql';

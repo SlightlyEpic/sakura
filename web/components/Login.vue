@@ -3,6 +3,7 @@ import type { z } from 'zod';
 import type { FormSubmitEvent } from '#ui/types'
 import type { FetchError } from 'ofetch';
 import { loginBodySchema } from '~/shared/api-schema/auth';
+import { authClient } from '~/lib/auth-client';
 
 type Schema = z.output<typeof loginBodySchema>;
 
@@ -23,12 +24,19 @@ const toast = useToast();
 async function onSubmit(event: FormSubmitEvent<Schema>) {
     isLoading.value = true;
     try {
-        await $fetch('/api/auth/login', {
-            method: 'POST',
-            body: event.data,
+        const { data, error } = await authClient.signIn.email({
+            email: event.data.email,
+            password: event.data.password,
+            callbackURL: '/app',
         });
-
-        navigateTo(props.onLoginRedirect ?? '/');
+        
+        if(error) {
+            toast.add({
+                title: 'Login failed',
+                description: error.message ?? error.statusText,
+                color: 'red',
+            });
+        }
     } catch(_err: unknown) {
         const err = _err as FetchError;
         toast.add({
@@ -50,16 +58,22 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
             <div class="text-gray-400">Enter your credentials to access your account.</div>
         </div>
         <div class="flex flex-col gap-2">
-            <a href="/auth/github">
-                <UButton class="w-full flex items-center justify-center gap-2" variant="soft" size="md">
-                    <Icon name="icon-park-outline:github" size="20" /> GitHub
-                </UButton>
-            </a>
-            <a href="/auth/google">
-                <UButton class="w-full flex items-center justify-center gap-2" variant="soft" size="md">
-                    <Icon name="icon-park-outline:google" size="20" /> Google
-                </UButton>
-            </a>
+            <UButton 
+                class="w-full flex items-center justify-center gap-2" variant="soft" size="md"
+                @click="authClient.signIn.social({
+                    provider: 'github',
+                })"
+            >
+                <Icon name="icon-park-outline:github" size="20" /> GitHub
+            </UButton>
+            <UButton 
+                class="w-full flex items-center justify-center gap-2" variant="soft" size="md"
+                @click="authClient.signIn.social({
+                    provider: 'google',
+                })"
+            >
+                <Icon name="icon-park-outline:google" size="20" /> Google
+            </UButton>
         </div>
 
         <UDivider label="or" />

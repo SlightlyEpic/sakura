@@ -3,6 +3,7 @@ import type { z } from 'zod';
 import type { FormSubmitEvent } from '#ui/types'
 import type { FetchError } from 'ofetch';
 import { signupBodySchema } from '~/shared/api-schema/auth';
+import { authClient } from '~/lib/auth-client';
 
 type Schema = z.output<typeof signupBodySchema>;
 
@@ -24,12 +25,24 @@ const toast = useToast();
 async function onSubmit(event: FormSubmitEvent<Schema>) {
     isLoading.value = true;
     try {
-        await $fetch('/api/auth/signup', {
-            method: 'POST',
-            body: event.data,
+        const { data, error } = await authClient.signUp.email({
+            name: event.data.name,
+            email: event.data.email,
+            password: event.data.password,
         });
 
-        navigateTo(props.onSignUpRedirect ?? '/');
+        if(error) {
+            toast.add({
+                title: 'Sign Up failed',
+                description: error.message ?? error.statusText,
+                color: 'red',
+            });
+        } else {
+            toast.add({
+                title: 'Sign Up successful',
+                color: 'green',
+            });
+        }
     } catch(_err: unknown) {
         const err = _err as FetchError;
         toast.add({

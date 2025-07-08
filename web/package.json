@@ -1,5 +1,5 @@
 {
-  "name": "nuxt-app",
+  "name": "sakura-web",
   "private": true,
   "type": "module",
   "packageManager": "pnpm@10.2.1",
@@ -8,7 +8,8 @@
     "dev": "nuxt dev",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
-    "postinstall": "nuxt prepare"
+    "postinstall": "nuxt prepare",
+    "auth:generate": "npx @better-auth/cli generate --config server/lib/auth.ts --output server/database/schema/auth.sql.ts --y"
   },
   "dependencies": {
     "@codemirror/autocomplete": "^6.18.6",
@@ -28,8 +29,6 @@
     "dotenv": "^16.4.7",
     "drizzle-orm": "^0.39.1",
     "nuxt": "^3.15.4",
-    "nuxt-auth-utils": "0.5.14",
-    "nuxt-authorization": "0.3.3",
     "nuxt-codemirror": "^0.0.11",
     "pinia": "^2.3.0",
     "postgres": "^3.4.5",

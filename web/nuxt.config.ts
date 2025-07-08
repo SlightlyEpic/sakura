@@ -4,8 +4,6 @@ export default defineNuxtConfig({
   devtools: { enabled: true },
   pages: true,
   modules: [
-    'nuxt-auth-utils',
-    'nuxt-authorization',
     '@nuxt/icon',
     '@nuxt/ui',
     '@pinia/nuxt',
