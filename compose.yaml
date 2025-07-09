@@ -1,0 +1,43 @@
+services:
+  garage:
+    image: dxflrs/garage:v2.0.0
+    container_name: garage
+    ports:
+      - "3900:3900"   # S3 API port
+      - "3901:3901"   # Garage admin API port
+      - "3902:3902"
+      - "3903:3903"
+    volumes:
+      - garage-meta:/var/lib/meta
+      - garage-data:/var/lib/data
+      - ./garage/garage.toml:/etc/garage.toml
+    environment:
+      - GARAGE_CONFIG=/etc/garage.toml
+
+  compile-serv:
+    build:
+      context: ./compile-serv
+      dockerfile: Dockerfile
+    container_name: compile-serv
+    ports:
+      - "8080:8080"
+    depends_on:
+      - garage
+    environment:
+      S3_ENDPOINT_URL: "http://garage:3900"
+
+  webui:
+    image: khairul169/garage-webui:latest
+    container_name: garage-webui
+    restart: unless-stopped
+    volumes:
+      - ./garage/garage.toml:/etc/garage.toml:ro
+    ports:
+      - 3909:3909
+    environment:
+      API_BASE_URL: "http://garage:3903"
+      S3_ENDPOINT_URL: "http://garage:3900"
+
+volumes:
+  garage-meta:
+  garage-data:
