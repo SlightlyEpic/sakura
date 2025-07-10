@@ -16,6 +16,6 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/*
 
 COPY --from=builder /go-service /usr/local/bin/go-service
-EXPOSE 8080
+EXPOSE 4001
 
 ENTRYPOINT ["go-service"]

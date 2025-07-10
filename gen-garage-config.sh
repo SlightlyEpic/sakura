@@ -1,4 +1,6 @@
-cat > garage.toml << EOF
+#!/bin/bash
+
+cat > garage/garage.toml << EOF
 metadata_dir = "/var/lib/meta"
 data_dir = "/var/lib/data"
 db_engine = "sqlite"

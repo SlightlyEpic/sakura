@@ -20,11 +20,13 @@ services:
       dockerfile: Dockerfile
     container_name: compile-serv
     ports:
-      - "8080:8080"
+      - "4001:4001"
     depends_on:
       - garage
     environment:
-      S3_ENDPOINT_URL: "http://garage:3900"
+      SERVICE_S3_ENDPOINT_URL: "http://garage:3900"
+      SERVICE_S3_ACCESS_KEY_ID: "${S3_ACCESS_KEY_ID}"
+      SERVICE_S3_SECRET_ACCESS_KEY: "${S3_SECRET_ACCESS_KEY}"
 
   webui:
     image: khairul169/garage-webui:latest
