@@ -6,68 +6,62 @@ import (
 	"io"
 	"net/http"
 	"os"
-	"os/signal"
-	"sync"
 	"time"
+
+	"github.com/slightlyepic/sakura/compile-serv/routes"
+	"github.com/slightlyepic/sakura/compile-serv/routes/middleware"
 
 	"github.com/danielgtaylor/huma/v2"
 	"github.com/danielgtaylor/huma/v2/adapters/humago"
+	"github.com/danielgtaylor/huma/v2/humacli"
 )
 
-const port = "8080"
-
-func main() {
-	ctx := context.Background()
-	ctx, cancel := signal.NotifyContext(ctx, os.Interrupt)
-	defer cancel()
-
-	if err := run(ctx, os.Stdout, os.Stderr); err != nil {
-		fmt.Fprintf(os.Stderr, "%s\n", err)
-		os.Exit(1)
-	}
+type CliOptions struct {
+	Debug bool   `doc:"Enable debug logging" default:"false"`
+	Host  string `doc:"Hostname to listen on." default:"127.0.0.1"`
+	Port  int    `doc:"Port to listen on." short:"p" default:"8080"`
 }
 
-func run(
-	ctx context.Context,
-	stdout, stderr io.Writer,
-) error {
-	mux, _ := NewServer()
-	srv := &http.Server{
-		Addr:    fmt.Sprintf("0.0.0.0:%s", port),
-		Handler: mux,
-	}
+func main() {
+	run(os.Stdout, os.Stderr)
+}
 
-	// Start the server
-	go func() {
-		fmt.Fprintf(stdout, "listening on %s\n", srv.Addr)
-		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-			fmt.Fprintf(stderr, "error listening and serving: %s\n", err)
+func run(stdout, stderr io.Writer) {
+	cli := humacli.New(func(hooks humacli.Hooks, options *CliOptions) {
+		fmt.Fprintf(stdout, "CLI Options%+v\n", *options)
+
+		mux, _ := NewServer()
+		srv := &http.Server{
+			Addr:    fmt.Sprintf("%s:%d", options.Host, options.Port),
+			Handler: mux,
 		}
-	}()
 
-	// Graceful shutdown
-	var wg sync.WaitGroup
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
-		<-ctx.Done()
+		hooks.OnStart(func() {
+			fmt.Fprintf(stdout, "listening on %s\n", srv.Addr)
+			if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+				fmt.Fprintf(stderr, "error listening and serving: %s\n", err)
+			}
+		})
 
-		// 10 second time limit for shutting down
-		shutdownCtx := context.Background()
-		shutdownCtx, cancel := context.WithTimeout(shutdownCtx, 10*time.Second)
-		defer cancel()
-		if err := srv.Shutdown(shutdownCtx); err != nil && err != http.ErrServerClosed {
-			fmt.Fprintf(stderr, "error shutting down http server: %s\n", err)
-		}
-	}()
-	wg.Wait()
+		hooks.OnStop(func() {
+			shutdownCtx := context.Background()
+			shutdownCtx, cancel := context.WithTimeout(shutdownCtx, 10*time.Second)
+			defer cancel()
+			if err := srv.Shutdown(shutdownCtx); err != nil && err != http.ErrServerClosed {
+				fmt.Fprintf(stderr, "error shutting down http server: %s\n", err)
+			}
+		})
+	})
 
-	return nil
+	cli.Run()
 }
 
 func NewServer() (*http.ServeMux, huma.API) {
 	mux := http.NewServeMux()
 	api := humago.New(mux, huma.DefaultConfig("Compile Service", "0.1.0"))
-	// add routes
+
+	api.UseMiddleware(middleware.AuthnMiddleware)
+	routes.AddRoutes(api)
+
 	return mux, api
 }
