@@ -10,39 +10,42 @@ import (
 
 	"github.com/slightlyepic/sakura/compile-serv/routes"
 	"github.com/slightlyepic/sakura/compile-serv/routes/middleware"
+	"github.com/slightlyepic/sakura/compile-serv/storage"
+	"github.com/slightlyepic/sakura/compile-serv/util"
 
 	"github.com/danielgtaylor/huma/v2"
 	"github.com/danielgtaylor/huma/v2/adapters/humago"
 	"github.com/danielgtaylor/huma/v2/humacli"
 )
 
-type CliOptions struct {
-	Debug             bool   `doc:"Enable debug logging" default:"false"`
-	Host              string `doc:"Hostname to listen on." default:"127.0.0.1"`
-	Port              int    `doc:"Port to listen on." short:"p" default:"4001"`
-	S3EndpointUrl     string `doc:"S3 endpoint to fetch files from"`
-	S3AccessKeyId     string `doc:"S3 access credentials"`
-	S3SecretAccessKey string `doc:"S3 access credentials"`
-}
-
 func main() {
 	run(os.Stdout, os.Stderr)
 }
 
 func run(stdout, stderr io.Writer) {
-	cli := humacli.New(func(hooks humacli.Hooks, options *CliOptions) {
+	cli := humacli.New(func(hooks humacli.Hooks, options *util.CliOptions) {
 		if problems := options.Validate(); len(problems) > 0 {
 			fmt.Fprintf(stderr, "error while validating options:\n")
 			for k, v := range problems {
 				fmt.Fprintf(stderr, "- %s: %s\n", k, v)
 			}
 
-			panic("error while validating options")
+			os.Exit(1)
 		}
-
 		fmt.Fprintf(stdout, "CLI Options%s\n", options.String())
 
-		mux, _ := NewServer()
+		storageClient, err := storage.NewClient(options.S3EndpointUrl, options.S3AccessKeyId, options.S3SecretAccessKey)
+		if err != nil {
+			fmt.Fprintf(stderr, "%s", err)
+			os.Exit(1)
+		}
+
+		mux, _, err := NewServer(storageClient)
+		if err != nil {
+			fmt.Fprintf(stderr, "%s", err)
+			os.Exit(1)
+		}
+
 		srv := &http.Server{
 			Addr:    fmt.Sprintf("%s:%d", options.Host, options.Port),
 			Handler: mux,
@@ -68,35 +71,17 @@ func run(stdout, stderr io.Writer) {
 	cli.Run()
 }
 
-func NewServer() (*http.ServeMux, huma.API) {
+func NewServer(
+	s storage.StorageClient,
+) (*http.ServeMux, huma.API, error) {
 	mux := http.NewServeMux()
 	api := humago.New(mux, huma.DefaultConfig("Compile Service", "0.1.0"))
 
 	api.UseMiddleware(middleware.AuthnMiddleware)
-	routes.AddRoutes(api)
-
-	return mux, api
-}
-
-func (o *CliOptions) String() string {
-	return fmt.Sprintf(
-		"{Debug:%v Host:%s Port:%d S3EndpointUrl:%s S3AccessKeyId:*** S3SecretAccessKey:***}",
-		o.Debug, o.Host, o.Port, o.S3EndpointUrl,
-	)
-}
-
-func (o *CliOptions) Validate() map[string]string {
-	problems := make(map[string]string)
-
-	if len(o.S3EndpointUrl) == 0 {
-		problems["S3EndpointUrl"] = "missing value"
-	}
-	if len(o.S3AccessKeyId) == 0 {
-		problems["S3AccessKeyId"] = "missing value"
-	}
-	if len(o.S3SecretAccessKey) == 0 {
-		problems["S3SecretAccessKey"] = "missing value"
+	err := routes.AddRoutes(api, s)
+	if err != nil {
+		return nil, nil, err
 	}
 
-	return problems
+	return mux, api, nil
 }
