@@ -8,6 +8,7 @@ import (
 	"os"
 	"time"
 
+	compilepooler "github.com/slightlyepic/sakura/compile-serv/compile_pooler"
 	"github.com/slightlyepic/sakura/compile-serv/routes"
 	"github.com/slightlyepic/sakura/compile-serv/routes/middleware"
 	"github.com/slightlyepic/sakura/compile-serv/storage"
@@ -34,13 +35,20 @@ func run(stdout, stderr io.Writer) {
 		}
 		fmt.Fprintf(stdout, "CLI Options%s\n", options.String())
 
+		// * Storage Client
 		storageClient, err := storage.NewClient(options.S3EndpointUrl, options.S3AccessKeyId, options.S3SecretAccessKey)
 		if err != nil {
 			fmt.Fprintf(stderr, "%s", err)
 			os.Exit(1)
 		}
 
-		mux, _, err := NewServer(storageClient)
+		// * Compile Pool
+		const compilePoolWorkers = 1
+		const compilePoolQueueSize = 5 * compilePoolWorkers
+		compilePool := compilepooler.NewCompilePool(compilePoolWorkers, compilePoolQueueSize)
+		compilePool.Start()
+
+		mux, _, err := NewServer(storageClient, compilePool)
 		if err != nil {
 			fmt.Fprintf(stderr, "%s", err)
 			os.Exit(1)
@@ -73,12 +81,13 @@ func run(stdout, stderr io.Writer) {
 
 func NewServer(
 	s storage.StorageClient,
+	p *compilepooler.CompilePool,
 ) (*http.ServeMux, huma.API, error) {
 	mux := http.NewServeMux()
 	api := humago.New(mux, huma.DefaultConfig("Compile Service", "0.1.0"))
 
 	api.UseMiddleware(middleware.AuthnMiddleware)
-	err := routes.AddRoutes(api, s)
+	err := routes.AddRoutes(api, s, p)
 	if err != nil {
 		return nil, nil, err
 	}

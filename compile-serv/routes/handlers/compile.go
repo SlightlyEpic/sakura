@@ -4,8 +4,10 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"os"
 
 	"github.com/danielgtaylor/huma/v2"
+	compilepooler "github.com/slightlyepic/sakura/compile-serv/compile_pooler"
 	"github.com/slightlyepic/sakura/compile-serv/storage"
 )
 
@@ -21,7 +23,11 @@ type CompileOutput struct {
 	}
 }
 
-func AddCompileRoute(api huma.API, s storage.StorageClient) error {
+func AddCompileRoute(
+	api huma.API,
+	s storage.StorageClient,
+	p *compilepooler.CompilePool,
+) error {
 	huma.Register(api, huma.Operation{
 		OperationID: "compile",
 		Method:      http.MethodPost,
@@ -34,9 +40,24 @@ func AddCompileRoute(api huma.API, s storage.StorageClient) error {
 			return nil, err
 		}
 
+		job := compilepooler.CompileJob{
+			SourcePath: localPath,
+			Result:     make(chan *compilepooler.CompileJobResult),
+		}
+		p.AddJob(job)
+		jobResult := <-job.Result
+		if jobResult.Error != nil {
+			return nil, jobResult.Error
+		}
+
+		binData, err := os.ReadFile(jobResult.BinaryPath)
+		if err != nil {
+			return nil, fmt.Errorf("failed to read file: %w", err)
+		}
+
 		resp := &CompileOutput{}
-		resp.Body.Message = fmt.Sprintf("Success: %s", localPath)
-		resp.Body.OutBinary = []byte{}
+		resp.Body.Message = "Success"
+		resp.Body.OutBinary = binData
 
 		return resp, nil
 	})
