@@ -9,4 +9,9 @@ export default defineNuxtConfig({
     '@pinia/nuxt',
     'nuxt-codemirror',
   ],
+  runtimeConfig: {
+    public: {
+      compileServiceOrigin: process.env.COMPILE_SERVICE_ORIGIN
+    }
+  }
 })

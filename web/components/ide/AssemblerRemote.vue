@@ -1,46 +1,33 @@
 <script setup lang="ts">
-import AVRLASS from '~/assets/lib/avrlass';
 import { parse as parseIntelHex } from '~/assets/lib/intel-hex';
 
 const props = defineProps<{
     asmSource: string,
 }>();
 
-// @ts-expect-error
-const avr = AVRLASS as AVRLASS;
+const runtimeConfig = useRuntimeConfig();
 
 const hexOut = ref<string>();
 const binOut = ref<Uint8Array | undefined>();
 const compileError = ref<string | undefined>();
 
-const includeCache = useIncludeCacheStore();
-
-async function readInclude(filename: string) {
-    try {
-        if(includeCache.get(filename)) {
-            compileError.value = undefined;
-            return includeCache.get(filename)!;
-        }
-
-        const res = await $fetch<string>(`/includes/${filename}`, {
-            responseType: 'text'
-        });
-
-        includeCache.set(filename, res);
-        compileError.value = undefined;
-        return res;
-    } catch(_err: unknown) {
-        compileError.value = `Invalid include ${filename}`;
-        throw _err;
-    }
-}
-
 async function assemble() {
     try {
-        const newHex = await avr.asm_to_hex(props.asmSource ?? '', readInclude);
-        const { data: newBin } = parseIntelHex(newHex);
+        const compileEndpoint = runtimeConfig.public.compileServiceOrigin + '/compile';
+        type CompileResponseBody = {
+            $schema: string,
+            hex: string,
+            message: string,
+        }
+        const resp = await $fetch<CompileResponseBody>(compileEndpoint, {
+            method: 'POST',
+            body: JSON.stringify({
+                objectName: 'blink.asm',
+            })
+        });
+        const { data: newBin } = parseIntelHex(resp.hex);
 
-        hexOut.value = newHex;
+        hexOut.value = resp.hex;
         binOut.value = newBin;
     } catch(_err: unknown) {
         compileError.value = `${_err}`;

@@ -3,7 +3,7 @@ import { EditorView, type ViewUpdate } from '@codemirror/view';
 import { Compartment, type Extension } from '@codemirror/state';
 import { indentUnit } from '@codemirror/language';
 import type { CodeMirrorRef, Statistics } from '~/types/nuxt-codemirror';
-import sampleCode from '~/assets/misc/sample-code.S?raw';
+import sampleCode from '~/assets/misc/sample-code.asm?raw';
 
 const container = useTemplateRef<HTMLDivElement>('container');
 const codemirror = useTemplateRef<CodeMirrorRef>('codemirror');

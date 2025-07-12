@@ -47,7 +47,7 @@ const tabItems = [
                                 v-if="item.label === 'Simulator'"
                                 :prog-data="assembler?.binOut"
                             />
-                            <IdeAssembler 
+                            <IdeAssemblerRemote 
                                 ref="assembler-ref"
                                 v-else-if="item.label === 'Assembler'"
                                 :asm-source="editor?.code ?? ''"
