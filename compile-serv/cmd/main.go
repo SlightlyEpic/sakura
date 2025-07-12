@@ -8,6 +8,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/rs/cors"
 	compilepooler "github.com/slightlyepic/sakura/compile-serv/compile_pooler"
 	"github.com/slightlyepic/sakura/compile-serv/routes"
 	"github.com/slightlyepic/sakura/compile-serv/routes/middleware"
@@ -82,15 +83,24 @@ func run(stdout, stderr io.Writer) {
 func NewServer(
 	s storage.StorageClient,
 	p *compilepooler.CompilePool,
-) (*http.ServeMux, huma.API, error) {
+	// ) (*http.ServeMux, huma.API, error) {
+) (http.Handler, huma.API, error) {
 	mux := http.NewServeMux()
-	api := humago.New(mux, huma.DefaultConfig("Compile Service", "0.1.0"))
 
+	c := cors.New(cors.Options{
+		AllowedOrigins:   []string{"http://localhost:3000"},
+		AllowCredentials: true,
+		Debug:            false,
+	})
+	handler := c.Handler(mux)
+
+	api := humago.New(mux, huma.DefaultConfig("Compile Service", "0.1.0"))
 	api.UseMiddleware(middleware.AuthnMiddleware)
+
 	err := routes.AddRoutes(api, s, p)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	return mux, api, nil
+	return handler, api, nil
 }

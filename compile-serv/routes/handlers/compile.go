@@ -18,8 +18,8 @@ type CompileInput struct {
 }
 type CompileOutput struct {
 	Body struct {
-		Message   string `json:"message" doc:"Compile status"`
-		OutBinary []byte `json:"outBinary" doc:"The compiled binary"`
+		CompilerOutput string `json:"message" doc:"Output from the compiler"`
+		Hex            string `json:"hex" doc:"The compiled intel hex file"`
 	}
 }
 
@@ -50,14 +50,21 @@ func AddCompileRoute(
 			return nil, jobResult.Error
 		}
 
-		binData, err := os.ReadFile(jobResult.BinaryPath)
+		ihex, err := os.ReadFile(jobResult.HexPath)
+
+		// Cleanup
+		os.Remove(jobResult.NewSourcePath)
+		os.Remove(jobResult.HexPath)
+		os.Remove(jobResult.HexPath[:len(jobResult.HexPath)-4] + ".eep.hex")
+		os.Remove(jobResult.HexPath[:len(jobResult.HexPath)-4] + ".obj")
+
 		if err != nil {
 			return nil, fmt.Errorf("failed to read file: %w", err)
 		}
 
 		resp := &CompileOutput{}
-		resp.Body.Message = "Success"
-		resp.Body.OutBinary = binData
+		resp.Body.CompilerOutput = jobResult.CompilerOutput
+		resp.Body.Hex = string(ihex)
 
 		return resp, nil
 	})

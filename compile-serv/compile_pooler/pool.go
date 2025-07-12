@@ -9,8 +9,10 @@ type CompileJob struct {
 
 // BinaryPath is set if no error
 type CompileJobResult struct {
-	Error      error
-	BinaryPath string
+	Error          error
+	CompilerOutput string
+	NewSourcePath  string
+	HexPath        string
 }
 
 type CompilePool struct {
