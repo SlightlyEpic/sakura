@@ -1,0 +1,24 @@
+{
+  "name": "yjs-server",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "",
+  "scripts": {
+    "start:yredis-server": "node src/yredis-server.js",
+    "start:s3-persist-worker": "node src/persist-worker.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "packageManager": "pnpm@10.12.4",
+  "engines": {
+    "node": "^20.0.0"
+  },
+  "dependencies": {
+    "@y/redis": "github:SlightlyEpic/y-redis#devel",
+    "dotenv": "^17.2.0"
+  },
+  "devDependencies": {
+    "yjs": "^13.6.27"
+  }
+}

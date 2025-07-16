@@ -1,1 +1,1 @@
-export { user, account, session, verification } from './auth.sql';
+export { user, account, session, verification, jwks } from './auth.sql';

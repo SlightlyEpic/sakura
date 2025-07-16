@@ -1,0 +1,11 @@
+FROM node:22-slim
+
+WORKDIR /app
+RUN corepack enable
+COPY package.json pnpm-lock.yaml .
+RUN pnpm install
+
+# source code is added through a volume mount
+
+EXPOSE 3000
+CMD ["pnpm", "dev"]

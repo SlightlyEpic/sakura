@@ -14,21 +14,6 @@ services:
     environment:
       - GARAGE_CONFIG=/etc/garage.toml
 
-  compile-serv:
-    build:
-      context: ./compile-serv
-      dockerfile: Dockerfile
-    container_name: compile-serv
-    ports:
-      - "4001:4001"
-    depends_on:
-      - garage
-    environment:
-      SERVICE_HOST: "0.0.0.0"
-      SERVICE_S3_ENDPOINT_URL: "garage:3900"
-      SERVICE_S3_ACCESS_KEY_ID: "${S3_ACCESS_KEY_ID}"
-      SERVICE_S3_SECRET_ACCESS_KEY: "${S3_SECRET_ACCESS_KEY}"
-
   webui:
     image: khairul169/garage-webui:latest
     container_name: garage-webui
@@ -41,6 +26,77 @@ services:
       API_BASE_URL: "http://garage:3903"
       S3_ENDPOINT_URL: "http://garage:3900"
 
+  redis:
+    image: redis:8.0-bookworm
+    container_name: redis
+    ports:
+      - "6379:6379"
+
+  yredis-server:
+    build:
+      context: ./yjs-server
+      dockerfile: Dockerfile
+    container_name: yredis-server
+    ports:
+      - "3002:3002"
+    depends_on:
+      - redis
+      - garage
+      - nuxt
+    environment:
+      S3_ENDPOINT: "garage"
+      S3_PORT: "9000"
+      S3_ACCESS_KEY: "${YREDIS_S3_ACCESS_KEY_ID}"
+      S3_SECRET_KEY: "${YREDIS_S3_SECRET_ACCESS_KEY}"
+      AUTH_PUBLIC_KEY_ENDPOINT: "http://nuxt:3000/api/y/jwks"
+    command: npm run start:yredis-server
+  
+  yredis-worker:
+    build:
+      context: ./yjs-server
+      dockerfile: Dockerfile
+    container_name: yredis-worker
+    depends_on:
+      - redis
+      - garage
+      - nuxt
+    environment:
+      S3_ENDPOINT: "garage"
+      S3_PORT: "9000"
+      S3_ACCESS_KEY: "${YREDIS_S3_ACCESS_KEY_ID}"
+      S3_SECRET_KEY: "${YREDIS_S3_SECRET_ACCESS_KEY}"
+      AUTH_PUBLIC_KEY_ENDPOINT: "http://nuxt:3000/api/y/jwks"
+    command: npm run start:s3-persist-worker
+
+  compile-serv:
+    build:
+      context: ./compile-serv
+      dockerfile: Dockerfile
+    container_name: compile-serv
+    ports:
+      - "4001:4001"
+    depends_on:
+      - garage
+    environment:
+      SERVICE_HOST: "0.0.0.0"
+      SERVICE_S3_ENDPOINT_URL: "garage:3900"
+      SERVICE_S3_ACCESS_KEY_ID: "${COMPILE_SERV_S3_ACCESS_KEY_ID}"
+      SERVICE_S3_SECRET_ACCESS_KEY: "${COMPILE_SERV_S3_SECRET_ACCESS_KEY}"
+
+  nuxt:
+    build:
+      context: ./web
+      dockerfile: "Dockerfile.dev"
+    environment:
+      NUXT_HOST: "0.0.0.0"
+    volumes:
+      - ./web:/app
+      - nuxt-node-modules:/app/node_modules/
+    tmpfs: /tmp
+    ports:
+      - "3000:3000"
+
 volumes:
   garage-meta:
   garage-data:
+  nuxt-node-modules:
