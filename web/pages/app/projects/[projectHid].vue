@@ -6,6 +6,7 @@ definePageMeta({
 
 const route = useRoute();
 const projectHid = route.params.projectHid as string;
+provide('projectHid', projectHid);
 </script>
 
 <template>

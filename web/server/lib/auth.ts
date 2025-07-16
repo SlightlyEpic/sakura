@@ -1,13 +1,21 @@
 import { betterAuth } from "better-auth";
 import { jwt } from 'better-auth/plugins';
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
-import { useDB } from '../database/db';
-
-const db = useDB();
+import { db } from '../database/db';
 
 export const auth = betterAuth({
     plugins: [
-        jwt(),
+        jwt({
+            jwt: {
+                definePayload: (session) => {
+                    return {
+                        id: session.user.id,
+                        email: session.user.email,
+                        yuserid: session.user.id,
+                    }
+                }
+            }
+        }),
     ],
     database: drizzleAdapter(db, {
         provider: 'pg'

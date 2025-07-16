@@ -1,7 +1,7 @@
 import { drizzle } from 'drizzle-orm/postgres-js';
 import * as schema from './schema';
 
-const db = drizzle({
+export const db = drizzle({
     connection: {
         user: process.env.POSTGRES_USER as string,
         password: process.env.POSTGRES_PASSWORD as string,
@@ -11,7 +11,3 @@ const db = drizzle({
     },
     schema,
 });
-
-export function useDB() {
-    return db;
-}

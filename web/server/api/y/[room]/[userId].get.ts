@@ -1,4 +1,6 @@
+import { sql } from "drizzle-orm";
 import { z } from "zod";
+import { db } from "~/server/database/db";
 
 const routeParams = z.object({
     room: z.string().min(1),
@@ -11,6 +13,27 @@ type PermResponse = {
     yuserid: string,
 }
 
-export default defineEventHandler((event) => {
-    const params = getValidatedRouterParams(event, routeParams.parse);
+export default defineEventHandler(async (event) => {
+    const params = await getValidatedRouterParams(event, routeParams.parse);
+
+    const project = db.query.project.findFirst({
+        where: (fields, operators) => {
+            return operators.eq(fields.id, sql.placeholder(params.room)) && 
+                operators.eq(fields.ownerId, sql.placeholder(params.userId));
+        },
+    });
+
+    if(!project) {
+        return {
+            yroom: params.room,
+            yaccess: 'no-access',
+            yuserid: params.userId,
+        } satisfies PermResponse;
+    }
+
+    return {
+        yroom: params.room,
+        yaccess: 'rw',
+        yuserid: params.userId,
+    } satisfies PermResponse;
 });
