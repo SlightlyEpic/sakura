@@ -4,7 +4,7 @@ import { createS3Storage } from '@y/redis/storage/s3';
 
 const port = Number(process.env.PORT || '3002');
 const redisPrefix = process.env.REDIS_PREFIX || 'y';
-const checkPermCallbackUrl = env.ensureConf('AUTH_PERM_CALLBACK');
+const checkPermCallbackUrl = process.env.AUTH_PERM_CALLBACK;
 
 const bucketName = 'ydocs';
 const store = createS3Storage(bucketName);
