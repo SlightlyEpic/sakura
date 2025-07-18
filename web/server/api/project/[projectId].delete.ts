@@ -2,7 +2,8 @@ import { z } from "zod";
 import { StatusCodes } from 'http-status-codes';
 import { auth } from "~/server/lib/auth";
 import { db } from "~/server/database/db";
-import { sql } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
+import { project } from "~/server/database/schema";
 
 const routeParams = z.object({
     projectId: z.coerce.number().min(1),
@@ -20,12 +21,16 @@ export default defineEventHandler(async (event) => {
 
     const params = await getValidatedRouterParams(event, routeParams.parse);
 
-    const project = await db.query.project.findFirst({
-        where: (fields, operators) => {
-            return operators.eq(fields.id, params.projectId) &&
-                operators.eq(fields.ownerId, session.user.id)
-        },
-    })
+    const deleteResult = await db
+        .delete(project)
+        .where(and(
+            eq(project.ownerId, session.user.id),
+            eq(project.id, params.projectId),
+        ))
+        .returning();
     
-    return project;
+    return {
+        message: 'Successfully deleted',
+        project: deleteResult.length > 0 ? deleteResult[0] : undefined,
+    };
 });

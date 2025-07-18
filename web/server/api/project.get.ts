@@ -1,4 +1,3 @@
-import { z } from "zod";
 import { StatusCodes } from 'http-status-codes';
 import { auth } from "~/server/lib/auth";
 import { db } from "~/server/database/db";
@@ -8,15 +7,15 @@ export default defineEventHandler(async (event) => {
     const session = await auth.api.getSession(event);
 
     if(!session) {
-        setResponseStatus(event, StatusCodes.UNAUTHORIZED);
-        return {
+        throw createError({
+            statusCode: StatusCodes.UNAUTHORIZED,
             message: 'Log in is required',
-        };
+        })
     }
 
     const projects = await db.query.project.findMany({
         where: (fields, operators) => {
-            return operators.eq(fields.ownerId, sql.placeholder(session.user.id))
+            return operators.eq(fields.ownerId, session.user.id)
         },
     })
     

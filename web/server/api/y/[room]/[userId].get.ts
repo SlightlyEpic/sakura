@@ -3,7 +3,7 @@ import { z } from "zod";
 import { db } from "~/server/database/db";
 
 const routeParams = z.object({
-    room: z.string().min(1),
+    room: z.coerce.number().min(1),
     userId: z.string().min(1),
 })
 
@@ -18,21 +18,21 @@ export default defineEventHandler(async (event) => {
 
     const project = db.query.project.findFirst({
         where: (fields, operators) => {
-            return operators.eq(fields.id, sql.placeholder(params.room)) && 
-                operators.eq(fields.ownerId, sql.placeholder(params.userId));
+            return operators.eq(fields.id, params.room) && 
+                operators.eq(fields.ownerId, params.userId);
         },
     });
 
     if(!project) {
         return {
-            yroom: params.room,
+            yroom: params.room.toString(),
             yaccess: 'no-access',
             yuserid: params.userId,
         } satisfies PermResponse;
     }
 
     return {
-        yroom: params.room,
+        yroom: params.room.toString(),
         yaccess: 'rw',
         yuserid: params.userId,
     } satisfies PermResponse;
