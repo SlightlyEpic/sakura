@@ -2,6 +2,10 @@
 import type { IdeEditor } from '#components';
 import { SplitterGroup, SplitterPanel, SplitterResizeHandle } from 'reka-ui';
 
+const props = defineProps<{
+    projectHumanId: string,
+}>();
+
 const editor = useTemplateRef('editor-ref');
 const assembler = useTemplateRef('assembler-ref');
 const simulator = useTemplateRef('simulator-ref');
@@ -25,7 +29,7 @@ const tabItems = [
 
             <SplitterGroup direction="horizontal">
                 <SplitterPanel>
-                    <IdeEditor ref="editor-ref" />
+                    <IdeEditor ref="editor-ref" :project-human-id="props.projectHumanId" />
                 </SplitterPanel>
                 <SplitterResizeHandle :as-child="true">
                     <UDivider class="w-0" orientation="vertical" icon="i-clarity-drag-handle-line" />

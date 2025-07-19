@@ -45,7 +45,7 @@ services:
       - nuxt
     environment:
       S3_ENDPOINT: "garage"
-      S3_PORT: "9000"
+      S3_PORT: "3900"
       S3_ACCESS_KEY: "${YREDIS_S3_ACCESS_KEY_ID}"
       S3_SECRET_KEY: "${YREDIS_S3_SECRET_ACCESS_KEY}"
       AUTH_PUBLIC_KEY_ENDPOINT: "http://nuxt:3000/api/y/jwks"
@@ -62,7 +62,7 @@ services:
       - nuxt
     environment:
       S3_ENDPOINT: "garage"
-      S3_PORT: "9000"
+      S3_PORT: "3900"
       S3_ACCESS_KEY: "${YREDIS_S3_ACCESS_KEY_ID}"
       S3_SECRET_KEY: "${YREDIS_S3_SECRET_ACCESS_KEY}"
       AUTH_PUBLIC_KEY_ENDPOINT: "http://nuxt:3000/api/y/jwks"

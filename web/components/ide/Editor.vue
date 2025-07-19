@@ -1,87 +1,75 @@
 <script setup lang="ts">
 import * as Y from 'yjs';
 import { WebsocketProvider } from 'y-websocket';
-import { EditorView, type ViewUpdate } from '@codemirror/view';
-import { Compartment, type Extension } from '@codemirror/state';
-import { indentUnit } from '@codemirror/language';
-import type { CodeMirrorRef, Statistics } from '~/types/nuxt-codemirror';
-import sampleCode from '~/assets/misc/sample-code.asm?raw';
+import { yCollab } from 'y-codemirror.next';
+import { authClient } from '~/lib/auth-client';
+import { userIdToColor } from '~/shared/utils/misc';
+import { IdeEditorWithYjs } from '#components';
+import type { Extension } from '@codemirror/state';
 
-const projectHid = inject<string>('projectHid');
+const props = defineProps<{
+    projectHumanId: string,
+}>();
+
+const session = authClient.useSession();
+const runtimeConfig = useRuntimeConfig();
 
 const container = useTemplateRef<HTMLDivElement>('container');
-const codemirror = useTemplateRef<CodeMirrorRef>('codemirror');
 
-const code = ref(sampleCode);
+// yjs
+const userColor = computed(() => userIdToColor(session.value.data?.user.id ?? ''));
+const ydoc = shallowRef<Y.Doc>();
+const provider = shallowRef<WebsocketProvider>();
+const ytext = shallowRef<Y.Text>();
+const undoManager = shallowRef<Y.UndoManager>();
+const yCollabExtension = shallowRef<Extension>();
 
-// Editor settings
-const wordWrap = ref(false);
-const indentSize = ref(4);
+const code = computed(() => ytext.value ? ytext.value.toString() : '');
 
-// Extensions
-const lineWrapComp = new Compartment();
-const indentSizeComp = new Compartment();
+// CodeMirror can only be mounted after this
+const readyToMountCodeMirror = ref(false);
 
-const extensions: Extension[] = [
-    lineWrapComp.of(wordWrap.value ? EditorView.lineWrapping : []),
-    indentSizeComp.of(indentUnit.of(' '.repeat(indentSize.value))),
-];
+const { data: project, status: projectStatus } = useFetch(() => `/api/project/hid/${props.projectHumanId}`);
 
-// Reconfigure extensions when refs change
-watch(wordWrap, () => {
-    if(!codemirror.value) return;
-    if(!codemirror.value.view) return;
-    codemirror.value.view.dispatch({
-        effects: lineWrapComp.reconfigure(wordWrap.value ? EditorView.lineWrapping : []),
-    });
+watch([project, projectStatus], async () => {
+    if(readyToMountCodeMirror.value === false && projectStatus.value === 'success' && project.value && !provider.value) {
+        const { token: authToken } = await $fetch<{ token: string }>('/api/auth/token');
+        console.log('token:', authToken);
+        ydoc.value = new Y.Doc();
+        provider.value = new WebsocketProvider(
+            runtimeConfig.public.ywebsocketServerEndpoint,
+            project.value.id.toString(),
+            ydoc.value,
+            { params: { yauth: authToken } }
+        );
+        ytext.value = ydoc.value.getText();
+        undoManager.value = new Y.UndoManager(ytext.value);
+        provider.value.awareness.setLocalStateField('user', {
+            name: session.value.data!.user.name,
+            color: userColor.value,
+            colorLight: '#ffffff'
+        });
+        yCollabExtension.value = yCollab(ytext.value, provider.value.awareness, { undoManager: undoManager.value });
+
+        readyToMountCodeMirror.value = true;
+    }
 });
-
-watch(indentSize, () => {
-    if(!codemirror.value) return;
-    if(!codemirror.value.view) return;
-    codemirror.value.view.dispatch({
-        effects: indentSizeComp.reconfigure(indentUnit.of(' '.repeat(indentSize.value))),
-    });
-})
-
-const handleChange = (value: string, viewUpdate: ViewUpdate) => {
-    // console.log('Value changed:', value);
-    // console.log('View updated:', viewUpdate);
-};
-
-const handleStatistics = (stats: Statistics) => {
-    // console.log('Editor statistics:', stats);
-};
-
-const handleUpdate = (viewUpdate: ViewUpdate) => {
-    // console.log('Editor updated:', viewUpdate);
-};
 
 defineExpose({
     code,
-});
+})
 </script>
 
 <template>
     <div ref="container" class="w-full h-full flex flex-col grow font-mono">
-        <IdeEditorSettings
-            v-model:word-wrap="wordWrap"
-            v-model:indent-size="indentSize"
-        />
-        <NuxtCodeMirror
-            ref="codemirror"
-            v-model="code"
-            :extensions="extensions"
-            theme="dark"
-            placeholder="Enter your code here..."
-            :auto-focus="true"
-            :editable="true"
-            :basic-setup="true"
-            :indent-with-tab="true"
-            @on-change="(handleChange)"
-            @statistics="(handleStatistics)"
-            @on-update="(handleUpdate)"
-            class="w-full h-full"
+        <div v-if="!readyToMountCodeMirror" class="w-full h-full flex flex-col items-center justify-center gap-2 p-2">
+            <div>Loading</div>
+            <UProgress animation="carousel" class="w-full max-w-36" />
+        </div>
+        <IdeEditorWithYjs v-else 
+            :project-id="project!.id" 
+            :yCollabExtension="yCollabExtension!"
+            :docText="ytext!"
         />
     </div>
 </template>

@@ -10,7 +10,7 @@ importers:
     dependencies:
       '@y/redis':
         specifier: github:SlightlyEpic/y-redis#devel
-        version: https://codeload.github.com/SlightlyEpic/y-redis/tar.gz/6d601eb8e3c0f48c29b6673df53207e9640bf2a4
+        version: https://codeload.github.com/SlightlyEpic/y-redis/tar.gz/5104e9efcd7f49599b4847121bfd8f23b05c76a9
       dotenv:
         specifier: ^17.2.0
         version: 17.2.0
@@ -50,8 +50,8 @@ packages:
     peerDependencies:
       '@redis/client': ^1.0.0
 
-  '@y/redis@https://codeload.github.com/SlightlyEpic/y-redis/tar.gz/6d601eb8e3c0f48c29b6673df53207e9640bf2a4':
-    resolution: {tarball: https://codeload.github.com/SlightlyEpic/y-redis/tar.gz/6d601eb8e3c0f48c29b6673df53207e9640bf2a4}
+  '@y/redis@https://codeload.github.com/SlightlyEpic/y-redis/tar.gz/5104e9efcd7f49599b4847121bfd8f23b05c76a9':
+    resolution: {tarball: https://codeload.github.com/SlightlyEpic/y-redis/tar.gz/5104e9efcd7f49599b4847121bfd8f23b05c76a9}
     version: 0.1.6
     engines: {node: '>=20.0.0', npm: '>=8.0.0'}
     hasBin: true
@@ -195,11 +195,19 @@ packages:
   isomorphic.js@0.2.5:
     resolution: {integrity: sha512-PIeMbHqMt4DnUP3MA/Flc0HElYjMXArsw1qwJZcm9sqR8mq3l8NYizFMty0pWwE/tzIGH3EKK5+jes5mAr85yw==}
 
+  jose@6.0.12:
+    resolution: {integrity: sha512-T8xypXs8CpmiIi78k0E+Lk7T2zlK4zDyg+o1CZ4AkOHgDg98ogdP2BeZ61lTFKFyoEwJ9RgAgN+SdM3iPgNonQ==}
+
   json-stream@1.0.0:
     resolution: {integrity: sha512-H/ZGY0nIAg3QcOwE1QN/rK/Fa7gJn7Ii5obwp6zyPO4xiPNwpIMjqy2gwjBEGqzkF/vSWEIBQCBuN19hYiL6Qg==}
 
   lib0@0.2.111:
     resolution: {integrity: sha512-NZPvycjIPaSY1DV9uz88RJYFwrul6kLMtZGIw1T1zE6i1E9q17XElZJPfWVn2iVDQTLLqhJijghuVxKS/z8EHQ==}
+    engines: {node: '>=16'}
+    hasBin: true
+
+  lib0@0.2.114:
+    resolution: {integrity: sha512-gcxmNFzA4hv8UYi8j43uPlQ7CGcyMJ2KQb5kZASw6SnAKAf10hK12i2fjrS3Cl/ugZa5Ui6WwIu1/6MIXiHttQ==}
     engines: {node: '>=16'}
     hasBin: true
 
@@ -341,9 +349,10 @@ snapshots:
     dependencies:
       '@redis/client': 1.6.1
 
-  '@y/redis@https://codeload.github.com/SlightlyEpic/y-redis/tar.gz/6d601eb8e3c0f48c29b6673df53207e9640bf2a4':
+  '@y/redis@https://codeload.github.com/SlightlyEpic/y-redis/tar.gz/5104e9efcd7f49599b4847121bfd8f23b05c76a9':
     dependencies:
-      lib0: 0.2.111
+      jose: 6.0.12
+      lib0: 0.2.114
       redis: 4.7.1
       uws: uWebSockets.js@https://codeload.github.com/uNetworking/uWebSockets.js/tar.gz/f97da56fe535bb6d318c62ed31e0f44cef104f05
       y-protocols: 1.0.6(yjs@13.6.27)
@@ -523,10 +532,16 @@ snapshots:
 
   isomorphic.js@0.2.5: {}
 
+  jose@6.0.12: {}
+
   json-stream@1.0.0:
     optional: true
 
   lib0@0.2.111:
+    dependencies:
+      isomorphic.js: 0.2.5
+
+  lib0@0.2.114:
     dependencies:
       isomorphic.js: 0.2.5
 
@@ -680,7 +695,7 @@ snapshots:
 
   y-protocols@1.0.6(yjs@13.6.27):
     dependencies:
-      lib0: 0.2.111
+      lib0: 0.2.114
       yjs: 13.6.27
 
   yallist@4.0.0: {}

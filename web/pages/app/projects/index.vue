@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { z } from 'zod';
 import { FetchError } from 'ofetch';
-import { project } from '~/server/database/schema';
 
 definePageMeta({
     middleware: ['auth'],

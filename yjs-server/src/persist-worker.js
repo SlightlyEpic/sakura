@@ -1,7 +1,6 @@
 import 'dotenv/config';
 import * as yredis from '@y/redis';
 import { createS3Storage } from '@y/redis/storage/s3';
-import * as Y from 'yjs';
 
 const redisPrefix = process.env.REDIS_PREFIX || 'y'
 
@@ -18,7 +17,7 @@ if (ydocUpdateCallback != null && ydocUpdateCallback.slice(-1) !== '/') {
 }
 
 /**
- * @type {(room: string, ydoc: Y.Doc) => Promise<void>}
+ * @type {(room: string, ydoc: import('yjs').Doc) => Promise<void>}
  */
 const updateCallback = async (room, ydoc) => {
     if (ydocUpdateCallback != null) {

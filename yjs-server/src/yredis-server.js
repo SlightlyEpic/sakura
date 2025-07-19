@@ -2,6 +2,7 @@ import 'dotenv/config';
 import * as yredis from '@y/redis';
 import { createS3Storage } from '@y/redis/storage/s3';
 
+const host = process.env.HOST || 'localhost';
 const port = Number(process.env.PORT || '3002');
 const redisPrefix = process.env.REDIS_PREFIX || 'y';
 const checkPermCallbackUrl = process.env.AUTH_PERM_CALLBACK;
@@ -13,4 +14,4 @@ try {
     await store.client.makeBucket(bucketName);
 } catch (_) { }
 
-yredis.createYWebsocketServer({ port, store, checkPermCallbackUrl, redisPrefix })
+yredis.createYWebsocketServer({ host, port, store, checkPermCallbackUrl, redisPrefix })

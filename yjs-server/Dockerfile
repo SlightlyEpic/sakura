@@ -1,9 +1,8 @@
 FROM node:20
 
-RUN apt-get update && apt-get install -y iproute2
-
 WORKDIR /app
+RUN corepack enable
 COPY package.json pnpm-lock.yaml .
-RUN npm install --omit=dev
+RUN pnpm install --prod
 COPY .env .
 COPY src ./src

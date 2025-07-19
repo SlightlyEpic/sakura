@@ -6,9 +6,8 @@ definePageMeta({
 
 const route = useRoute();
 const projectHid = route.params.projectHid as string;
-provide('projectHid', projectHid);
 </script>
 
 <template>
-<Ide />
+<Ide :project-human-id="projectHid" />
 </template>

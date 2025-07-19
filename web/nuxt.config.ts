@@ -11,7 +11,8 @@ export default defineNuxtConfig({
   ],
   runtimeConfig: {
     public: {
-      compileServiceOrigin: process.env.COMPILE_SERVICE_ORIGIN
+      compileServiceOrigin: process.env.COMPILE_SERVICE_ORIGIN,
+      ywebsocketServerEndpoint: process.env.YWEBSOCKET_SERVER_ENDPOINT,
     }
   }
 })
