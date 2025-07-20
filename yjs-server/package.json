@@ -4,8 +4,9 @@
   "type": "module",
   "description": "",
   "scripts": {
-    "start:yredis-server": "node src/yredis-server.js",
-    "start:s3-persist-worker": "node src/persist-worker.js"
+    "build": "tsup",
+    "start:yredis-server": "node dist/yredis-server.js",
+    "start:s3-persist-worker": "node dist/persist-worker.js"
   },
   "keywords": [],
   "author": "",
@@ -16,9 +17,14 @@
   },
   "dependencies": {
     "@y/redis": "github:SlightlyEpic/y-redis#devel",
-    "dotenv": "^17.2.0"
+    "dotenv": "^17.2.0",
+    "minio": "^7.1.3",
+    "uuid": "^11.1.0",
+    "yjs": "^13.6.27"
   },
   "devDependencies": {
-    "yjs": "^13.6.27"
+    "@types/node": "^24.0.15",
+    "tsup": "^8.5.0",
+    "typescript": "^5.8.3"
   }
 }
