@@ -65,8 +65,8 @@ export class S3Storage implements AbstractStorage {
         references: string[] | null,
     } | null> {
         console.log(`s3 adapter: retrieving doc room=${room} docname=${docname}`);
-        const objNames = await this.client.listObjectsV2(this.bucketName, encodeS3ObjectName(room, docname), true).toArray();
-        const references = objNames.map(obj => obj.name);
+        const objNames: minio.BucketItem[] = await this.client.listObjectsV2(this.bucketName, encodeS3ObjectName(room, docname), true).toArray();
+        const references = objNames.map(obj => obj.name!);
         console.log(`s3 adapter: retrieved doc room=${room} docname=${docname}`);
 
         if (references.length === 0) return null;
