@@ -1,0 +1,3 @@
+# Only put there to make the LSP happy
+# For builds its properly pulled through the repo (check dockerfile)
+yffi/libyrs.h

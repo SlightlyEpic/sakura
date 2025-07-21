@@ -14,6 +14,7 @@ import (
 	"github.com/slightlyepic/sakura/compile-serv/routes/middleware"
 	"github.com/slightlyepic/sakura/compile-serv/storage"
 	"github.com/slightlyepic/sakura/compile-serv/util"
+	_ "github.com/slightlyepic/sakura/compile-serv/yffi"
 
 	"github.com/danielgtaylor/huma/v2"
 	"github.com/danielgtaylor/huma/v2/adapters/humago"
